@@ -174,70 +174,127 @@ namespace DoAn1_LTDT
             {
                 for (int j = 0; j < maTranLatNguoc.GetLength(1); j++)
                 {
-                    if(maTranLatNguoc[i,j] == 1)
+                    if(maTranLatNguoc[i, j] == 1 && maTranLatNguoc[j, i] == 1)
+                    {
+                        maTranLatNguoc[i, j] = maTranLatNguoc[j, i] = 2;
+                    }
+                    else if (maTranLatNguoc[i, j] == 1)
                     {
                         maTranLatNguoc[i, j] = 0;
-                        maTranLatNguoc[j, i] = 1;
+                        maTranLatNguoc[j, i] = 2;
+                    }
+                }
+            }
+            for (int i = 0; i < maTranLatNguoc.GetLength(0); i++)
+            {
+                for (int j = 0; j < maTranLatNguoc.GetLength(1); j++)
+                {
+                    if (maTranLatNguoc[i, j] == 2)
+                    {
+                        maTranLatNguoc[i, j] = 1;
                     }
                 }
             }
             return maTranLatNguoc;
         }
+        public static bool KiemTra(int[] thuTu, int u)
+        {
+            for (int i = 0; i < thuTu.Length; i++)
+            {
+                if (u == thuTu[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
         public static int[] Them(int[] thuTu, int u)
         {
-            for(int i = 0; i < thuTu.Length; i++)
+            if (KiemTra(thuTu, u))
             {
-                if(thuTu[i] != -1)
+                for (int i = 0; i < thuTu.Length; i++)
                 {
-                    thuTu[i] = u;
-                    break;
+                    if (thuTu[i] == -1)
+                    {
+                        thuTu[i] = u;
+                        break;
+                    }
                 }
             }
             return thuTu;
         }
-        public static void DFS1(int[,] maTranKe, bool[] viengTham, int[] thuTu, int u)
+        public static void DFS1(int[,] maTranKe, bool[] viengTham, int[] thuTu, int[] dinhCha, int u)
         {
-            if(viengTham[u] == false)
+            if (viengTham[u] == false)
             {
                 viengTham[u] = true;
             }
             int v = -1;
-            for(int i = 0; i < maTranKe.GetLength(0); i++)
+            for (int i = 0; i < maTranKe.GetLength(0); i++)
             {
-                if(viengTham[i] == false && maTranKe[u, i] == 1)
+                if (viengTham[i] == false && maTranKe[u, i] == 1)
                 {
                     v = i;
                     break;
                 }
             }
-            if(v != -1)
+            if (v != -1)
             {
-                DFS1(maTranKe, viengTham, thuTu, v);
+                dinhCha[v] = u;
+                DFS1(maTranKe, viengTham, thuTu, dinhCha, v);
             }
-            else if(v == -1)
+            else if (v == -1)
             {
-                bool a = false;
-                for (int i = 0; i < maTranKe.GetLength(0); i++)
+                if (u - 1 >= 0)
                 {
-                    if (viengTham[i] == true)
+                    thuTu = Them(thuTu, u);
+                    DFS1(maTranKe, viengTham, thuTu, dinhCha, dinhCha[u]);
+                }
+                else if (u - 1 < 0)
+                {
+                    thuTu = Them(thuTu, u);
+                    int a = -1;
+                    for (int i = 0; i < viengTham.Length; i++)
                     {
-                        for (int j = 0; j < maTranKe.GetLength(1); j++)
+                        if (viengTham[i] == false)
                         {
-                            if (viengTham[j] == false)
-                            {   
-                                if (maTranKe[i, j] == 1)
-                                {
-                                    a = true;
-                                    break;
-                                }
-                            }
+                            a = i;
+                            break;
                         }
                     }
+                    if (a != -1)
+                    {
+                        DFS1(maTranKe, viengTham, thuTu, dinhCha, a);
+                    }
                 }
-                if (a)
+            }
+        }
+        public static void DFS2(int[,] maTranLatNguoc, bool[] viengTham, int u)
+        {
+            if (viengTham[u] == false)
+            {
+                viengTham[u] = true;
+                Console.Write($"{u} ");
+            }
+            for (int i = 0; i < viengTham.Length; i++)
+            {
+                if (viengTham[i] == false && maTranLatNguoc[u, i] == 1)
                 {
-                    Them(thuTu, u);
-                    DFS1(maTranKe, viengTham, thuTu, u - 1);
+                    DFS2(maTranLatNguoc, viengTham, i);
+                }
+            }
+        }
+        public static void ThanhPhanLienThongManh(int[,] maTranLatNguoc, bool[] viengTham, int[] thuTu)
+        {
+            int dem = 0;
+            for (int i = thuTu.Length - 1; i >= 0; i--)
+            {
+                if (viengTham[thuTu[i]] == false)
+                {
+                    dem++;
+                    Console.Write($"Thành phần liên thông mạnh thứ {dem}: ");
+                    DFS2(maTranLatNguoc, viengTham, thuTu[i]);
+                    Console.WriteLine();
                 }
             }
         }
@@ -274,6 +331,26 @@ namespace DoAn1_LTDT
                 {
                     Console.WriteLine("Đồ thị không liên thông");
                 }
+
+                maTranKe AM1;
+                AM1 = ChuyenDoi(AL);
+                int[,] maTranLatNguoc = new int[AM1.n, AM1.n];
+                maTranLatNguoc = AM1.maTran;
+                int[] thuTu = new int[AM1.n];
+                bool[] viengTham = new bool[AM1.n];
+                for (int i = 0; i < AM1.n; i++)
+                {
+                    thuTu[i] = -1;
+                }
+                int[] dinhCha = new int[AM1.n];
+                for (int i = 0; i < AM1.n; i++)
+                {
+                    dinhCha[i] = -1;
+                }
+                DFS1(AM1.maTran, viengTham, thuTu, dinhCha, 0);
+                maTranLatNguoc = DoThiLatNguoc(maTranLatNguoc);
+                bool[] viengTham1 = new bool[AM1.n];
+                ThanhPhanLienThongManh(maTranLatNguoc, viengTham1, thuTu);
             }
         }
     }
