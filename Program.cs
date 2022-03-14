@@ -166,6 +166,81 @@ namespace DoAn1_LTDT
             }
             return true;
         }
+        public static int[,] DoThiLatNguoc(int[,] maTranKe)
+        {
+            int[,] maTranLatNguoc = new int[maTranKe.GetLength(0), maTranKe.GetLength(1)];
+            maTranLatNguoc = maTranKe;
+            for (int i = 0; i < maTranLatNguoc.GetLength(0); i++)
+            {
+                for (int j = 0; j < maTranLatNguoc.GetLength(1); j++)
+                {
+                    if(maTranLatNguoc[i,j] == 1)
+                    {
+                        maTranLatNguoc[i, j] = 0;
+                        maTranLatNguoc[j, i] = 1;
+                    }
+                }
+            }
+            return maTranLatNguoc;
+        }
+        public static int[] Them(int[] thuTu, int u)
+        {
+            for(int i = 0; i < thuTu.Length; i++)
+            {
+                if(thuTu[i] != -1)
+                {
+                    thuTu[i] = u;
+                    break;
+                }
+            }
+            return thuTu;
+        }
+        public static void DFS1(int[,] maTranKe, bool[] viengTham, int[] thuTu, int u)
+        {
+            if(viengTham[u] == false)
+            {
+                viengTham[u] = true;
+            }
+            int v = -1;
+            for(int i = 0; i < maTranKe.GetLength(0); i++)
+            {
+                if(viengTham[i] == false && maTranKe[u, i] == 1)
+                {
+                    v = i;
+                    break;
+                }
+            }
+            if(v != -1)
+            {
+                DFS1(maTranKe, viengTham, thuTu, v);
+            }
+            else if(v == -1)
+            {
+                bool a = false;
+                for (int i = 0; i < maTranKe.GetLength(0); i++)
+                {
+                    if (viengTham[i] == true)
+                    {
+                        for (int j = 0; j < maTranKe.GetLength(1); j++)
+                        {
+                            if (viengTham[j] == false)
+                            {   
+                                if (maTranKe[i, j] == 1)
+                                {
+                                    a = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (a)
+                {
+                    Them(thuTu, u);
+                    DFS1(maTranKe, viengTham, thuTu, u - 1);
+                }
+            }
+        }
         static void Main(string[] args)
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
