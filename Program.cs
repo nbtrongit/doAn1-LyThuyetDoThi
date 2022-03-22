@@ -343,10 +343,6 @@ namespace DoAn1_LTDT
                     thuTu[i] = -1;
                 }
                 int[] dinhCha = new int[AM1.n];
-                for (int i = 0; i < AM1.n; i++)
-                {
-                    dinhCha[i] = 0;
-                }
                 DFS1(AM1.maTran, viengTham, thuTu, dinhCha, 0);
                 maTranLatNguoc = DoThiLatNguoc(maTranLatNguoc);
                 bool[] viengTham1 = new bool[AM1.n];
