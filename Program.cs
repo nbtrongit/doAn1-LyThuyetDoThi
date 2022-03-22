@@ -345,7 +345,7 @@ namespace DoAn1_LTDT
                 int[] dinhCha = new int[AM1.n];
                 for (int i = 0; i < AM1.n; i++)
                 {
-                    dinhCha[i] = -1;
+                    dinhCha[i] = 0;
                 }
                 DFS1(AM1.maTran, viengTham, thuTu, dinhCha, 0);
                 maTranLatNguoc = DoThiLatNguoc(maTranLatNguoc);
